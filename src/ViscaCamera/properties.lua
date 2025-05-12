@@ -1,4 +1,10 @@
 table.insert(props, {
+  Name = "Protocol",
+  Type = "enum",
+  Choices = {"Sony VISCA", "Raw VISCA"},
+  Value = "Sony VISCA"
+})
+table.insert(props, {
   Name = "Connection",
   Type = "enum",
   Choices = {"RS232", "UDP", "TCP"},
@@ -28,6 +34,13 @@ table.insert(props, {
   Value = 2,
   Min = 0.5,
   Max = 5.0
+})
+table.insert(props, {
+  Name = "Num Custom Commands",
+  Type = "integer",
+  Value = 0,
+  Min = 0,
+  Max = 10
 })
 table.insert(props, {
   Name = "Debug Print",

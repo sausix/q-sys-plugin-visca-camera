@@ -5,18 +5,20 @@ local h2 = 32                 --Height of control buttons
 local w1 = 280                --Width of group boxes
 local fs1 = 12                --FontSize of text elements
 
---Calculate preset gropup box size and save button offset
+--Calculate preset group box size and save button offset
 local NumPresets = props["Num Presets"].Value
 local NumPresetRows = math.floor((NumPresets - 1) / 8) + 1
-
 local PresetGroupHeight = 24 + (NumPresetRows * h2)
 if props["Preset Hold Save"].Value == false then
   PresetGroupHeight = PresetGroupHeight + (NumPresetRows * h2) + 8
 end
-
 local PresetSaveOffset = (h2 * NumPresetRows) + 8
 
-
+--Calculate custom commads group box size
+local NumCustomCmds =  props["Num Custom Commands"].Value
+local NumCustomCmdRows = NumCustomCmds
+local CustomCmdGroupHeight = 24 + (NumCustomCmdRows * h2)
+local CustomCmdOffset = 234 + PresetGroupHeight
 
 if CurrentPage == "Main" then
 
@@ -76,6 +78,21 @@ if CurrentPage == "Main" then
       CornerRadius = 8,
       Position = {0, 226},
       Size = {w1, PresetGroupHeight}
+    })
+  end
+
+  if NumCustomCmds > 0 then
+    table.insert(graphics,{
+      Type = "GroupBox",
+      Text = "Custom Commands",
+      FontSize = fs1,
+      HTextAlign = "Left",
+      Fill = Palette.White,
+      StrokeColor = Palette.Black,
+      StrokeWidth = 1,
+      CornerRadius = 8,
+      Position = {0, CustomCmdOffset},
+      Size = {w1, CustomCmdGroupHeight}
     })
   end
 
@@ -210,7 +227,7 @@ if CurrentPage == "Main" then
     Margin = 4,
     Position = {139, 150},
     Size = {h2, h2},
-  }    
+  }
   layout["tilt_up"] = {
     PrettyName = "Pan-Tilt-Zoom~Tilt Up",
     Legend = "",
@@ -219,7 +236,7 @@ if CurrentPage == "Main" then
     Margin = 4,
     Position = {139, 118},
     Size = {h2, h2},
-  }    
+  }
   layout["tilt_down"] = {
     PrettyName = "Pan-Tilt-Zoom~Tilt Down",
     Legend = "",
@@ -228,7 +245,7 @@ if CurrentPage == "Main" then
     Margin = 4,
     Position = {139, 182},
     Size = {h2, h2},
-  }    
+  }
   layout["pan_left"] = {
     PrettyName = "Pan-Tilt-Zoom~Pan Left",
     Legend = "",
@@ -237,7 +254,7 @@ if CurrentPage == "Main" then
     Margin = 4,
     Position = {107, 150},
     Size = {h2, h2},
-  }    
+  }
   layout["pan_right"] = {
     PrettyName = "Pan-Tilt-Zoom~Pan Right",
     Legend = "",
@@ -246,7 +263,7 @@ if CurrentPage == "Main" then
     Margin = 4,
     Position = {171, 150},
     Size = {h2, h2},
-  }    
+  }
   layout["pan_right_tilt_up"] = {
     PrettyName = "Pan-Tilt-Zoom~Pan Right / Tilt Up",
     Legend = "",
@@ -255,7 +272,7 @@ if CurrentPage == "Main" then
     Margin = 4,
     Position = {171, 118},
     Size = {h2, h2},
-  }    
+  }
   layout["pan_right_tilt_down"] = {
     PrettyName = "Pan-Tilt-Zoom~Pan Right / Tilt Down",
     Legend = "",
@@ -264,7 +281,7 @@ if CurrentPage == "Main" then
     Margin = 4,
     Position = {171, 182},
     Size = {h2, h2},
-  }    
+  }
   layout["pan_left_tilt_down"] = {
     PrettyName = "Pan-Tilt-Zoom~Pan Left / Tilt Down",
     Legend = "",
@@ -273,7 +290,7 @@ if CurrentPage == "Main" then
     Margin = 4,
     Position = {107, 182},
     Size = {h2, h2},
-  }    
+  }
   layout["pan_left_tilt_up"] = {
     PrettyName = "Pan-Tilt-Zoom~Pan Left / Tilt Up",
     Legend = "",
@@ -321,7 +338,6 @@ if CurrentPage == "Main" then
   }    
 
   -- Presets ----------------------------------------------------------------
-  
   layout["preset_saved"] = {
   PrettyName = "Preset~Preset Saved",
   Style = "Indicator",
@@ -361,6 +377,29 @@ if CurrentPage == "Main" then
         Size = {h2, h2}
       }
     end
+  end
+
+  -- Custom Commands --------------------------------------------------------
+  for cmd = 1, NumCustomCmds do
+    layout["Custom Command " .. string.format("%02d",cmd) .. " String"] = {
+      PrettyName = "Custom Command " .. string.format("%02d",cmd) .. " String",
+      Style = "Text",
+      FontSize = fs1,
+      HTextAlign = "Center",
+      Padding = 2,
+      StrokeWidth = 1,
+      Position = {15, CustomCmdOffset + (h2 * cmd) - 8},
+      Size = {216, h1}
+    }
+    layout["Custom Command " .. string.format("%02d",cmd) .. " Send"] = {
+      PrettyName = "Custom Command " .. string.format("%02d",cmd) .. " Send",
+      Style = "Button",
+      Margin = 4,
+      Color = Palette.Green,
+      Legend = "C" .. cmd,
+      Position = {235, CustomCmdOffset + (h2 * cmd) - 14},
+      Size = {h2, h2}
+    }
   end
 
 end

@@ -24,6 +24,20 @@ LocalPort = nil         --Auto select
 LocalNICName = nil      --Auto select  
 PollInteval = 10
 
+--Debug level
+DebugTx, DebugRx, DebugFunction = false, false, false
+DebugPrint = Properties["Debug Print"].Value
+if DebugPrint == "Tx/Rx" then
+  DebugTx, DebugRx = true, true
+elseif DebugPrint == "Tx" then
+  DebugTx = true
+elseif DebugPrint == "Rx" then
+  DebugRx = true
+elseif DebugPrint == "Function Calls" then
+  DebugFunction = true
+elseif DebugPrint == "All" then
+  DebugTx, DebugRx, DebugFunction = true, true, true
+end
 
 -- If a NIC is specified by name, bind LocalIPAddress to it
 function SelectNIC()
@@ -51,7 +65,7 @@ end
 
 -- Wrapper for safely binding local address
 function OpenPorts(ip, port)
-  if DebugFunction then print("OpenPorts() Called: " .. ip .. ":" .. port) end
+  if DebugFunction then print("OpenPorts() Called: " .. tostring(ip) .. ":" .. tostring(port)) end
   Connection:Open(ip, port)
 end
 
@@ -179,14 +193,25 @@ IPPortCtl.EventHandler = Initialize
 
 --^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+local Protocol = Properties["Protocol"].Value
 local MsgSeqIndex = 0
 local PresetHold = nil
 local NumPresets = Properties["Num Presets"].Value
 local PresetHoldTime = Properties["Preset Hold Time"].Value
 
+local NumCustomCmds =  Properties["Num Custom Commands"].Value
+
 local PanSpeed = Controls["setup_pan_speed"].Value
 local TiltSpeed = Controls["setup_tilt_speed"].Value
 local ZoomSpeed = Controls["setup_zoom_speed"].Value
+
+  
+function HexPrint(msg)
+  local hex = msg:gsub(".", function(char)
+    return '\\x'..string.format("%02x", char:byte())
+  end)
+  return hex
+end
 
 function HexToString(num, len)
   --Returns num as string of len * hex bytes
@@ -200,7 +225,7 @@ function HexToString(num, len)
 end
 
 function VISCA(typ, msg)	
-  --print("PTZ_Control(" .. typ .. ", " .. msg .. ")")	
+  print("PTZ_Control(" .. typ .. ", " .. msg .. ")")
   if ConnectionOpen == true then	
 
     CommsPollTimer:Start(PollInteval)	
@@ -223,13 +248,15 @@ function VISCA(typ, msg)
     local msgSeq = HexToString(MsgSeqIndex, 4)	
 
     --Build and send message
-    local viscaMsg = ""
-    if Properties["Command Set"].Value == "VISCA" then
-      viscaMsg = msg
-    elseif Properties["Command Set"].Value == "VISCA over IP" then
-      viscaMsg = msgType .. msgLen .. msgSeq .. msg	
+    if Protocol == 'Sony VISCA' then
+      local viscaMsg = msgType .. msgLen .. msgSeq .. msg
+      HexPrint(viscaMsg)
+      Send(viscaMsg)
+    elseif Protocol == 'Raw VISCA' then
+      local viscaMsg = msg
+      HexPrint(viscaMsg)
+      Send(viscaMsg)
     end
-    Send(viscaMsg)	
   end	
 end	
 
@@ -240,7 +267,6 @@ function PTZ_Control(func)
   local PS = PanSpeed
   local TS = TiltSpeed
   local ID = Controls["setup_camera_id"].Value + 128
-
 
   if     func == "preset_home_load"     then  VISCA("Cmd", string.char(ID,0x01,0x06,0x04,0xff))
 
@@ -362,6 +388,21 @@ function PresetHoldTimerHandler()
   end
 end
 PresetHoldTimer.EventHandler = PresetHoldTimerHandler
+
+-- Cutom Commands -----------------------------------------
+if NumCustomCmds > 0 then
+  for cmd = 1, NumCustomCmds do
+    local cmdSendCtl   = "Custom Command " .. string.format("%02d",cmd) .. " Send"
+    local cmdStringCtl = "Custom Command " .. string.format("%02d",cmd) .. " String"
+    Controls[cmdSendCtl].EventHandler = function(ctl)
+      if ctl.Boolean == true then
+        local s = Controls[cmdStringCtl].String
+        s = s:gsub("\\x(%x%x)",function (x) return string.char(tonumber(x,16)) end)
+        VISCA("Cmd", s)
+      end
+    end
+  end
+end
 
 --Comms polling and timeout ------------------------------
 CommsPollTimer = Timer.New()

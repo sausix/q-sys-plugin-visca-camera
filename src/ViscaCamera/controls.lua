@@ -1,6 +1,5 @@
-local ctrls = {}
   local NumPresets =  props["Num Presets"].Value
-  
+  local NumCustomCmds =  props["Num Custom Commands"].Value
   -- Connection ---------------------------------------------------------------
   table.insert(ctrls, {
     Name = "system_online",
@@ -228,11 +227,31 @@ local ctrls = {}
       ButtonType = "Momentary",
       Count = 1,
       UserPin = true,
-      PinStyle = "Input",
+      PinStyle = "Both",
       Icon = ""
     })
     table.insert(ctrls, {
       Name = "preset_save_" .. string.format("%03d",pst),
+      ControlType = "Button",
+      ButtonType = "Momentary",
+      Count = 1,
+      UserPin = true,
+      PinStyle = "Input",
+      Icon = ""
+    })
+  end
+
+  -- Custom Commands ----------------------------------------------------------
+  for cmd = 1, NumCustomCmds do
+    table.insert(ctrls, {
+      Name = "Custom Command " .. string.format("%02d",cmd) .. " String",
+      ControlType = "Text",
+      DefaultValue = "",
+      UserPin = false,
+      Count = 1
+    })
+    table.insert(ctrls, {
+      Name = "Custom Command " .. string.format("%02d",cmd) .. " Send",
       ControlType = "Button",
       ButtonType = "Momentary",
       Count = 1,

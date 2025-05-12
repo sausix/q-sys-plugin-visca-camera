@@ -4,7 +4,7 @@
 --[[
 ###############################################################################
 #
-# Copyright 2021 Richard Hills t/a Extrasolve             info@extrasolve.co.uk
+# Copyright 2025 Richard Hills t/a Extrasolve             info@extrasolve.co.uk
 #
 # Based on plugin framework Copyright 2021 QSC, LLC.
 #

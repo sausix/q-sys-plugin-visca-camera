@@ -12,3 +12,5 @@ QSC Q-SYS plugin for RS232/IP control of VISCA cameras using the standard VISCA 
 
 ## Contributions
 The original repo was forked from [Richard Hills (Extrasolve)](https://bitbucket.org/Extrasolve/visca_ip).
+
+12.05.2025 Merged custom commands feature from [Richard Hills (Extrasolve)](https://bitbucket.org/Extrasolve/visca_ip).
